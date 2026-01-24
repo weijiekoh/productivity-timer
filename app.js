@@ -3,6 +3,7 @@ let isRunning = false;
 let isWorkPhase = true;
 let timeRemaining = 25 * 60; // in seconds
 let timerInterval = null;
+let sessionCount = 0;
 
 // DOM elements
 const timerDisplay = document.getElementById('timerDisplay');
@@ -11,6 +12,47 @@ const startBtn = document.getElementById('startBtn');
 const resetBtn = document.getElementById('resetBtn');
 const workMinutesInput = document.getElementById('workMinutes');
 const restMinutesInput = document.getElementById('restMinutes');
+const sessionCounter = document.getElementById('sessionCounter');
+
+// Load settings from localStorage
+function loadSettings() {
+    const savedWorkMinutes = localStorage.getItem('workMinutes');
+    const savedRestMinutes = localStorage.getItem('restMinutes');
+    const savedSessionCount = localStorage.getItem('sessionCount');
+
+    if (savedWorkMinutes) {
+        workMinutesInput.value = savedWorkMinutes;
+    }
+    if (savedRestMinutes) {
+        restMinutesInput.value = savedRestMinutes;
+    }
+    if (savedSessionCount) {
+        sessionCount = parseInt(savedSessionCount);
+    }
+
+    timeRemaining = parseInt(workMinutesInput.value) * 60;
+}
+
+// Save settings to localStorage
+function saveSettings() {
+    localStorage.setItem('workMinutes', workMinutesInput.value);
+    localStorage.setItem('restMinutes', restMinutesInput.value);
+    localStorage.setItem('sessionCount', sessionCount);
+}
+
+// Request notification permission
+function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+}
+
+// Show browser notification
+function showNotification(title, body) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, { body });
+    }
+}
 
 // Format seconds to MM:SS
 function formatTime(seconds) {
@@ -21,22 +63,42 @@ function formatTime(seconds) {
 
 // Update display
 function updateDisplay() {
-    timerDisplay.textContent = formatTime(timeRemaining);
-    phaseIndicator.textContent = isWorkPhase ? 'Work' : 'Rest';
+    const timeStr = formatTime(timeRemaining);
+    const phaseStr = isWorkPhase ? 'Work' : 'Rest';
+
+    timerDisplay.textContent = timeStr;
+    phaseIndicator.textContent = phaseStr;
     phaseIndicator.className = 'phase-indicator ' + (isWorkPhase ? 'work' : 'rest');
+    sessionCounter.textContent = `Sessions: ${sessionCount}`;
+
+    // Update tab title
+    document.title = `${timeStr} - ${phaseStr}`;
 }
 
-// Switch phases
-function switchPhase() {
+// Phase ended - stop timer and prepare next phase
+function phaseEnded() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    isRunning = false;
+    startBtn.textContent = 'Start';
+    startBtn.classList.remove('running');
+
     if (isWorkPhase) {
+        // Work phase ended
         playWorkEndSound();
+        showNotification('Work Complete!', 'Time for a break.');
+        sessionCount++;
+        saveSettings();
         isWorkPhase = false;
         timeRemaining = parseInt(restMinutesInput.value) * 60;
     } else {
+        // Rest phase ended
         playRestEndSound();
+        showNotification('Break Over!', 'Ready to work?');
         isWorkPhase = true;
         timeRemaining = parseInt(workMinutesInput.value) * 60;
     }
+
     updateDisplay();
     showRandomQuote();
 }
@@ -47,13 +109,14 @@ function tick() {
         timeRemaining--;
         updateDisplay();
     } else {
-        switchPhase();
+        phaseEnded();
     }
 }
 
 // Start/Pause toggle
 function toggleTimer() {
     initAudio();
+    requestNotificationPermission();
 
     if (isRunning) {
         clearInterval(timerInterval);
@@ -82,6 +145,7 @@ function resetTimer() {
 
 // Handle input changes
 function handleInputChange() {
+    saveSettings();
     if (!isRunning) {
         if (isWorkPhase) {
             timeRemaining = parseInt(workMinutesInput.value) * 60;
@@ -92,11 +156,26 @@ function handleInputChange() {
     }
 }
 
+// Keyboard shortcuts
+function handleKeydown(e) {
+    // Ignore if typing in input fields
+    if (e.target.tagName === 'INPUT') return;
+
+    if (e.code === 'Space') {
+        e.preventDefault();
+        toggleTimer();
+    } else if (e.code === 'KeyR') {
+        resetTimer();
+    }
+}
+
 // Event listeners
 startBtn.addEventListener('click', toggleTimer);
 resetBtn.addEventListener('click', resetTimer);
 workMinutesInput.addEventListener('change', handleInputChange);
 restMinutesInput.addEventListener('change', handleInputChange);
+document.addEventListener('keydown', handleKeydown);
 
-// Initial display
+// Initialize
+loadSettings();
 updateDisplay();
