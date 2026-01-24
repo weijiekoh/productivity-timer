@@ -9,7 +9,6 @@ let sessionCount = 0;
 const timerDisplay = document.getElementById('timerDisplay');
 const phaseIndicator = document.getElementById('phaseIndicator');
 const startBtn = document.getElementById('startBtn');
-const resetBtn = document.getElementById('resetBtn');
 const workMinutesInput = document.getElementById('workMinutes');
 const restMinutesInput = document.getElementById('restMinutes');
 const sessionCounter = document.getElementById('sessionCounter');
@@ -73,6 +72,14 @@ function updateDisplay() {
 
     // Update tab title
     document.title = `${timeStr} - ${phaseStr}`;
+
+    // Hide UI during work phase
+    if (isWorkPhase && isRunning) {
+        document.body.classList.add('working');
+    } else {
+        document.body.classList.remove('working');
+    }
+    updateMinusButtons();
 }
 
 // Phase ended - stop timer and prepare next phase
@@ -129,17 +136,6 @@ function toggleTimer() {
         startBtn.classList.add('running');
     }
     isRunning = !isRunning;
-}
-
-// Reset timer
-function resetTimer() {
-    clearInterval(timerInterval);
-    timerInterval = null;
-    isRunning = false;
-    isWorkPhase = true;
-    timeRemaining = parseInt(workMinutesInput.value) * 60;
-    startBtn.textContent = 'Start';
-    startBtn.classList.remove('running');
     updateDisplay();
 }
 
@@ -154,6 +150,41 @@ function handleInputChange() {
         }
         updateDisplay();
     }
+    updateMinusButtons();
+}
+
+// Adjust time to multiples of 5 (for mobile +/- buttons)
+function adjustTime(type, delta) {
+    const input = type === 'work' ? workMinutesInput : restMinutesInput;
+    const current = parseInt(input.value);
+    let newValue;
+
+    if (delta > 0) {
+        // Round up to next multiple of 5
+        newValue = Math.ceil((current + 1) / 5) * 5;
+    } else {
+        // Round down to previous multiple of 5
+        newValue = Math.floor((current - 1) / 5) * 5;
+    }
+
+    newValue = Math.max(0, Math.min(99, newValue));
+    input.value = newValue;
+    handleInputChange();
+    updateMinusButtons();
+}
+
+// Update visibility of minus buttons based on input values
+function updateMinusButtons() {
+    const workMinus = document.getElementById('workMinus');
+    const restMinus = document.getElementById('restMinus');
+    const isWorking = isWorkPhase && isRunning;
+
+    if (workMinus) {
+        workMinus.style.visibility = (isWorking || parseInt(workMinutesInput.value) === 0) ? 'hidden' : '';
+    }
+    if (restMinus) {
+        restMinus.style.visibility = (isWorking || parseInt(restMinutesInput.value) === 0) ? 'hidden' : '';
+    }
 }
 
 // Keyboard shortcuts
@@ -164,14 +195,11 @@ function handleKeydown(e) {
     if (e.code === 'Space') {
         e.preventDefault();
         toggleTimer();
-    } else if (e.code === 'KeyR') {
-        resetTimer();
     }
 }
 
 // Event listeners
 startBtn.addEventListener('click', toggleTimer);
-resetBtn.addEventListener('click', resetTimer);
 workMinutesInput.addEventListener('change', handleInputChange);
 restMinutesInput.addEventListener('change', handleInputChange);
 document.addEventListener('keydown', handleKeydown);
@@ -179,3 +207,4 @@ document.addEventListener('keydown', handleKeydown);
 // Initialize
 loadSettings();
 updateDisplay();
+updateMinusButtons();

@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productivity Timer</title>
+    <meta property="og:title" content="Productivity Timer">
+    <meta property="og:description" content="A simple work/rest timer to boost your productivity">
+    <meta property="og:image" content="og-image.svg">
+    <meta property="og:type" content="website">
     <style>
         * {
             margin: 0;
@@ -97,18 +101,46 @@
         .setting-group {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
         }
 
         .setting-group label {
             font-size: 14px;
             color: #888;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .adjust-btn {
+            display: none;
+            width: 36px;
+            height: 36px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background: #16213e;
+            color: #888;
+            font-size: 20px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .adjust-btn:hover {
+            border-color: #888;
+            color: #eee;
+        }
+
+        .adjust-btn:active {
+            transform: scale(0.95);
         }
 
         .setting-group input {
-            width: 100px;
-            padding: 10px;
+            width: 60px;
+            padding: 8px;
             font-size: 16px;
             border: 2px solid #0f3460;
             border-radius: 6px;
@@ -122,21 +154,19 @@
             border-color: #e94560;
         }
 
-        .reset-btn {
-            background: transparent;
-            color: #888;
-            border: 1px solid #444;
-            padding: 8px 20px;
+        .unit {
             font-size: 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.2s;
+            color: #666;
         }
 
-        .reset-btn:hover {
-            color: #eee;
-            border-color: #888;
+        @media (max-width: 600px) {
+            .adjust-btn {
+                display: block;
+            }
+
+            .setting-group input {
+                width: 50px;
+            }
         }
 
         .session-counter {
@@ -168,6 +198,15 @@
             font-size: 13px;
             color: #666;
         }
+
+        /* Hide UI during work phase */
+        body.working .controls,
+        body.working .settings,
+        body.working .session-counter,
+        body.working .tagline,
+        body.working .adjust-btn {
+            visibility: hidden;
+        }
     </style>
 </head>
 <body>
@@ -188,16 +227,24 @@
 
         <div class="settings">
             <div class="setting-group">
-                <label for="workMinutes">Work (minutes)</label>
-                <input type="number" id="workMinutes" value="25" min="1" max="99">
+                <label for="workMinutes">Work</label>
+                <div class="input-row">
+                    <button class="adjust-btn" id="workMinus" onclick="adjustTime('work', -5)">-</button>
+                    <input type="number" id="workMinutes" value="25" min="0" max="99">
+                    <span class="unit">min</span>
+                    <button class="adjust-btn" onclick="adjustTime('work', 5)">+</button>
+                </div>
             </div>
             <div class="setting-group">
-                <label for="restMinutes">Rest (minutes)</label>
-                <input type="number" id="restMinutes" value="5" min="1" max="99">
+                <label for="restMinutes">Rest</label>
+                <div class="input-row">
+                    <button class="adjust-btn" id="restMinus" onclick="adjustTime('rest', -5)">-</button>
+                    <input type="number" id="restMinutes" value="5" min="0" max="99">
+                    <span class="unit">min</span>
+                    <button class="adjust-btn" onclick="adjustTime('rest', 5)">+</button>
+                </div>
             </div>
         </div>
-
-        <button class="reset-btn" id="resetBtn">Reset</button>
 
         <div class="session-counter" id="sessionCounter">Sessions: 0</div>
 

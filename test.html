@@ -80,6 +80,28 @@
             flex-direction: column;
             align-items: center;
         }
+
+        .og-preview {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid #333;
+        }
+
+        .og-preview h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .og-preview p {
+            margin-bottom: 20px;
+        }
+
+        .og-image {
+            max-width: 600px;
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
     </style>
 </head>
 <body>
@@ -101,6 +123,12 @@
                 </button>
                 <span class="description">Uplifting "da-ding"</span>
             </div>
+        </div>
+
+        <div class="og-preview">
+            <h2>OpenGraph Preview Image</h2>
+            <p>1200x630 - Used for social media sharing</p>
+            <img src="og-image.svg" alt="OpenGraph preview image" class="og-image">
         </div>
     </div>
 
