@@ -38,6 +38,7 @@ function switchPhase() {
         timeRemaining = parseInt(workMinutesInput.value) * 60;
     }
     updateDisplay();
+    showRandomQuote();
 }
 
 // Timer tick
