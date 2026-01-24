@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #1a1a2e;
+            color: #eee;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .timer-display {
+            background: #16213e;
+            border: 2px solid #0f3460;
+            border-radius: 12px;
+            padding: 30px 60px;
+            margin-bottom: 30px;
+        }
+
+        .phase-indicator {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: #888;
+        }
+
+        .phase-indicator.work {
+            color: #e94560;
+        }
+
+        .phase-indicator.rest {
+            color: #4ecca3;
+        }
+
+        .time {
+            font-family: 'Courier New', monospace;
+            font-size: 72px;
+            font-weight: bold;
+            letter-spacing: 4px;
+        }
+
+        .controls {
+            margin-bottom: 30px;
+        }
+
+        .start-btn {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .start-btn:hover {
+            background: #ff6b6b;
+        }
+
+        .start-btn:active {
+            transform: scale(0.98);
+        }
+
+        .start-btn.running {
+            background: #4ecca3;
+        }
+
+        .start-btn.running:hover {
+            background: #6ee6b8;
+        }
+
+        .settings {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .setting-group label {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .setting-group input {
+            width: 100px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #0f3460;
+            border-radius: 6px;
+            background: #16213e;
+            color: #eee;
+            text-align: center;
+        }
+
+        .setting-group input:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+
+        .reset-btn {
+            background: transparent;
+            color: #888;
+            border: 1px solid #444;
+            padding: 8px 20px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            color: #eee;
+            border-color: #888;
+        }
+
+        .tagline {
+            margin-top: 40px;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .quote {
+            margin-bottom: 30px;
+            max-width: 400px;
+        }
+
+        .quote-text {
+            font-style: italic;
+            color: #aaa;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .quote-author {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quote">
+            <div class="quote-text" id="quoteText">"The secret of getting ahead is getting started."</div>
+            <div class="quote-author" id="quoteAuthor">— Mark Twain</div>
+        </div>
+
+        <div class="timer-display">
+            <div class="phase-indicator" id="phaseIndicator">Work</div>
+            <div class="time" id="timerDisplay">25:00</div>
+        </div>
+
+        <div class="controls">
+            <button class="start-btn" id="startBtn">Start</button>
+        </div>
+
+        <div class="settings">
+            <div class="setting-group">
+                <label for="workMinutes">Work (minutes)</label>
+                <input type="number" id="workMinutes" value="25" min="1" max="99">
+            </div>
+            <div class="setting-group">
+                <label for="restMinutes">Rest (minutes)</label>
+                <input type="number" id="restMinutes" value="5" min="1" max="99">
+            </div>
+        </div>
+
+        <button class="reset-btn" id="resetBtn">Reset</button>
+
+        <div class="tagline">Created with Claude Code</div>
+    </div>
+
+    <script src="sounds.js"></script>
+    <script src="quotes.js"></script>
+    <script src="app.js"></script>
+    <script>showRandomQuote();</script>
+</body>
+</html>
