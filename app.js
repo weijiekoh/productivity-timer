@@ -4,6 +4,7 @@ let isWorkPhase = true;
 let timeRemaining = 25 * 60; // in seconds
 let timerInterval = null;
 let sessionCount = 0;
+let wakeLock = null;
 
 // DOM elements
 const timerDisplay = document.getElementById('timerDisplay');
@@ -12,6 +13,10 @@ const startBtn = document.getElementById('startBtn');
 const workMinutesInput = document.getElementById('workMinutes');
 const restMinutesInput = document.getElementById('restMinutes');
 const sessionCounter = document.getElementById('sessionCounter');
+const workMinus = document.getElementById('workMinus');
+const workPlus = document.getElementById('workPlus');
+const restMinus = document.getElementById('restMinus');
+const restPlus = document.getElementById('restPlus');
 
 // Load settings from localStorage
 function loadSettings() {
@@ -26,10 +31,10 @@ function loadSettings() {
         restMinutesInput.value = savedRestMinutes;
     }
     if (savedSessionCount) {
-        sessionCount = parseInt(savedSessionCount);
+        sessionCount = parseInt(savedSessionCount, 10);
     }
 
-    timeRemaining = parseInt(workMinutesInput.value) * 60;
+    timeRemaining = parseInt(workMinutesInput.value, 10) * 60;
 }
 
 // Save settings to localStorage
@@ -43,6 +48,25 @@ function saveSettings() {
 function requestNotificationPermission() {
     if ('Notification' in window && Notification.permission === 'default') {
         Notification.requestPermission();
+    }
+}
+
+// Request wake lock to keep screen on
+async function requestWakeLock() {
+    if ('wakeLock' in navigator) {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+        } catch (e) {
+            // Wake lock request failed (e.g., low battery)
+        }
+    }
+}
+
+// Release wake lock
+function releaseWakeLock() {
+    if (wakeLock) {
+        wakeLock.release();
+        wakeLock = null;
     }
 }
 
@@ -89,6 +113,7 @@ function phaseEnded() {
     isRunning = false;
     startBtn.textContent = 'Start';
     startBtn.classList.remove('running');
+    releaseWakeLock();
 
     if (isWorkPhase) {
         // Work phase ended
@@ -97,13 +122,13 @@ function phaseEnded() {
         sessionCount++;
         saveSettings();
         isWorkPhase = false;
-        timeRemaining = parseInt(restMinutesInput.value) * 60;
+        timeRemaining = parseInt(restMinutesInput.value, 10) * 60;
     } else {
         // Rest phase ended
         playRestEndSound();
         showNotification('Break Over!', 'Ready to work?');
         isWorkPhase = true;
-        timeRemaining = parseInt(workMinutesInput.value) * 60;
+        timeRemaining = parseInt(workMinutesInput.value, 10) * 60;
     }
 
     updateDisplay();
@@ -130,10 +155,12 @@ function toggleTimer() {
         timerInterval = null;
         startBtn.textContent = 'Start';
         startBtn.classList.remove('running');
+        releaseWakeLock();
     } else {
         timerInterval = setInterval(tick, 1000);
         startBtn.textContent = 'Pause';
         startBtn.classList.add('running');
+        requestWakeLock();
     }
     isRunning = !isRunning;
     updateDisplay();
@@ -144,9 +171,9 @@ function handleInputChange() {
     saveSettings();
     if (!isRunning) {
         if (isWorkPhase) {
-            timeRemaining = parseInt(workMinutesInput.value) * 60;
+            timeRemaining = parseInt(workMinutesInput.value, 10) * 60;
         } else {
-            timeRemaining = parseInt(restMinutesInput.value) * 60;
+            timeRemaining = parseInt(restMinutesInput.value, 10) * 60;
         }
         updateDisplay();
     }
@@ -156,7 +183,7 @@ function handleInputChange() {
 // Adjust time to multiples of 5 (for mobile +/- buttons)
 function adjustTime(type, delta) {
     const input = type === 'work' ? workMinutesInput : restMinutesInput;
-    const current = parseInt(input.value);
+    const current = parseInt(input.value, 10);
     let newValue;
 
     if (delta > 0) {
@@ -170,20 +197,17 @@ function adjustTime(type, delta) {
     newValue = Math.max(0, Math.min(99, newValue));
     input.value = newValue;
     handleInputChange();
-    updateMinusButtons();
 }
 
 // Update visibility of minus buttons based on input values
 function updateMinusButtons() {
-    const workMinus = document.getElementById('workMinus');
-    const restMinus = document.getElementById('restMinus');
     const isWorking = isWorkPhase && isRunning;
 
     if (workMinus) {
-        workMinus.style.visibility = (isWorking || parseInt(workMinutesInput.value) === 0) ? 'hidden' : '';
+        workMinus.style.visibility = (isWorking || parseInt(workMinutesInput.value, 10) === 0) ? 'hidden' : '';
     }
     if (restMinus) {
-        restMinus.style.visibility = (isWorking || parseInt(restMinutesInput.value) === 0) ? 'hidden' : '';
+        restMinus.style.visibility = (isWorking || parseInt(restMinutesInput.value, 10) === 0) ? 'hidden' : '';
     }
 }
 
@@ -203,6 +227,19 @@ startBtn.addEventListener('click', toggleTimer);
 workMinutesInput.addEventListener('change', handleInputChange);
 restMinutesInput.addEventListener('change', handleInputChange);
 document.addEventListener('keydown', handleKeydown);
+
+// Adjust button listeners
+if (workMinus) workMinus.addEventListener('click', () => adjustTime('work', -5));
+if (workPlus) workPlus.addEventListener('click', () => adjustTime('work', 5));
+if (restMinus) restMinus.addEventListener('click', () => adjustTime('rest', -5));
+if (restPlus) restPlus.addEventListener('click', () => adjustTime('rest', 5));
+
+// Warn before closing page while timer is running
+window.addEventListener('beforeunload', (e) => {
+    if (isRunning) {
+        e.preventDefault();
+    }
+});
 
 // Initialize
 loadSettings();

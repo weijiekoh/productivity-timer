@@ -77,6 +77,10 @@ const quotes = [
     }
 ];
 
+// DOM elements (cached)
+const quoteTextEl = document.getElementById('quoteText');
+const quoteAuthorEl = document.getElementById('quoteAuthor');
+
 // Get a random quote
 function getRandomQuote() {
     return quotes[Math.floor(Math.random() * quotes.length)];
@@ -84,11 +88,9 @@ function getRandomQuote() {
 
 // Display a quote in the UI
 function displayQuote(quote) {
-    const quoteText = document.getElementById('quoteText');
-    const quoteAuthor = document.getElementById('quoteAuthor');
-    if (quoteText && quoteAuthor) {
-        quoteText.textContent = `"${quote.text}"`;
-        quoteAuthor.textContent = `— ${quote.author}`;
+    if (quoteTextEl && quoteAuthorEl) {
+        quoteTextEl.textContent = `"${quote.text}"`;
+        quoteAuthorEl.textContent = `— ${quote.author}`;
     }
 }
 

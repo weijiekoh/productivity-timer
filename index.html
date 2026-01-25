@@ -2,8 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Productivity Timer</title>
+
+    <!-- PWA manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Theme color -->
+    <meta name="theme-color" content="#1a1a2e">
+
+    <!-- iOS PWA meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Timer">
+    <link rel="apple-touch-icon" href="icon-180.png">
+
+    <!-- OpenGraph -->
     <meta property="og:title" content="Productivity Timer">
     <meta property="og:description" content="A simple work/rest timer to boost your productivity">
     <meta property="og:image" content="og-image.svg">
@@ -229,19 +243,19 @@
             <div class="setting-group">
                 <label for="workMinutes">Work</label>
                 <div class="input-row">
-                    <button class="adjust-btn" id="workMinus" onclick="adjustTime('work', -5)">-</button>
+                    <button class="adjust-btn" id="workMinus">-</button>
                     <input type="number" id="workMinutes" value="25" min="0" max="99">
                     <span class="unit">min</span>
-                    <button class="adjust-btn" onclick="adjustTime('work', 5)">+</button>
+                    <button class="adjust-btn" id="workPlus">+</button>
                 </div>
             </div>
             <div class="setting-group">
                 <label for="restMinutes">Rest</label>
                 <div class="input-row">
-                    <button class="adjust-btn" id="restMinus" onclick="adjustTime('rest', -5)">-</button>
+                    <button class="adjust-btn" id="restMinus">-</button>
                     <input type="number" id="restMinutes" value="5" min="0" max="99">
                     <span class="unit">min</span>
-                    <button class="adjust-btn" onclick="adjustTime('rest', 5)">+</button>
+                    <button class="adjust-btn" id="restPlus">+</button>
                 </div>
             </div>
         </div>
