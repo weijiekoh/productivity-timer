@@ -36,10 +36,6 @@ const quotes = [
         author: "Erich Fromm"
     },
     {
-        text: "It is when you lose sight of yourself, that you lose your way. To keep your truth in sight you must keep yourself in sight.",
-        author: "C. JoyBell C."
-    },
-    {
         text: "Gratitude unlocks the fullness of life. It turns what we have into enough, and more.",
         author: "Melody Beattie"
     },
