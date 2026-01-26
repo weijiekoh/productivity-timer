@@ -123,6 +123,7 @@ function phaseEnded() {
         saveSettings();
         isWorkPhase = false;
         timeRemaining = parseInt(restMinutesInput.value, 10) * 60;
+        showRandomQuote();
     } else {
         // Rest phase ended
         playRestEndSound();
@@ -132,7 +133,6 @@ function phaseEnded() {
     }
 
     updateDisplay();
-    showRandomQuote();
 }
 
 // Timer tick
