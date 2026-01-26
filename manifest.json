@@ -2,7 +2,7 @@
   "name": "Productivity Timer",
   "short_name": "Timer",
   "description": "A simple work/rest timer to boost your productivity",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#1a1a2e",
