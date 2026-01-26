@@ -70,6 +70,26 @@ const quotes = [
     {
         text: "All that we are is the result of what we have thought.",
         author: "Buddha"
+    },
+    {
+        text: "Life can only be understood backwards; but it must be lived forwards.",
+        author: "Søren Kierkegaard"
+    },
+    {
+        text: "Reflect upon your present blessings, of which every person has many – not on your past misfortunes.",
+        author: "Charles Dickens"
+    },
+    {
+        text: "The journey into self-love and self-acceptance must begin with self-examination.",
+        author: "Iyanla Vanzant"
+    },
+    {
+        text: "It's on the strength of observation and reflection that one finds a way.",
+        author: "Claude Monet"
+    },
+    {
+        text: "Self-reflection is the school of wisdom.",
+        author: "Baltasar Gracián"
     }
 ];
 
