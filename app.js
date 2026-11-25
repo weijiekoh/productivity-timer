@@ -17,30 +17,18 @@ let isRunning = false;
 let isWorkPhase = true;
 let timeRemaining = workSeconds;
 let timerInterval = null;
-let sessionCount = 0;
 let wakeLock = null;
 
 // DOM elements
 const timerDisplay = document.getElementById('timerDisplay');
 const phaseIndicator = document.getElementById('phaseIndicator');
 const startBtn = document.getElementById('startBtn');
-const sessionCounter = document.getElementById('sessionCounter');
 
-// Load session count from localStorage
-function loadSettings() {
-    const savedSessionCount = localStorage.getItem('sessionCount');
-    if (savedSessionCount) {
-        sessionCount = parseInt(savedSessionCount, 10);
-    }
-
-    // Durations no longer persist; remove values saved by older versions
+// Settings no longer persist; remove values saved by older versions
+function clearLegacyStorage() {
     localStorage.removeItem('workMinutes');
     localStorage.removeItem('restMinutes');
-}
-
-// Save session count to localStorage
-function saveSettings() {
-    localStorage.setItem('sessionCount', sessionCount);
+    localStorage.removeItem('sessionCount');
 }
 
 // Request notification permission
@@ -91,7 +79,6 @@ function updateDisplay() {
     timerDisplay.textContent = timeStr;
     phaseIndicator.textContent = phaseStr;
     phaseIndicator.className = 'phase-indicator ' + (isWorkPhase ? 'work' : 'rest');
-    sessionCounter.textContent = `Sessions: ${sessionCount}`;
 
     // Update tab title
     document.title = `${timeStr} - ${phaseStr}`;
@@ -117,8 +104,6 @@ function phaseEnded() {
         // Work phase ended
         playWorkEndSound();
         showNotification('Work Complete!', 'Time for a break.');
-        sessionCount++;
-        saveSettings();
         isWorkPhase = false;
         timeRemaining = restSeconds;
         showRandomQuote();
@@ -184,5 +169,5 @@ window.addEventListener('beforeunload', (e) => {
 });
 
 // Initialize
-loadSettings();
+clearLegacyStorage();
 updateDisplay();
