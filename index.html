@@ -125,14 +125,8 @@
             background: #6ee6b8;
         }
 
-        .tagline {
-            margin-top: 40px;
-            font-size: 12px;
-            color: #555;
-        }
-
         .quote {
-            margin: 0 auto 30px;
+            margin: 0 auto;
             max-width: 400px;
             padding: 8px 12px;
             border-radius: 8px;
@@ -187,19 +181,13 @@
         }
 
         /* Hide UI during work phase */
-        body.working .controls,
-        body.working .tagline {
+        body.working .controls {
             visibility: hidden;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="quote" id="quote" role="button" tabindex="0" aria-label="Show another quote">
-            <div class="quote-text" id="quoteText" aria-live="polite">"The secret of getting ahead is getting started."</div>
-            <div class="quote-author" id="quoteAuthor">— Mark Twain</div>
-        </div>
-
         <div class="timer-display">
             <div class="phase-indicator" id="phaseIndicator">Work</div>
             <div class="time" id="timerDisplay">25:00</div>
@@ -209,7 +197,10 @@
             <button class="start-btn" id="startBtn">Start</button>
         </div>
 
-        <div class="tagline">Created with Claude Code</div>
+        <div class="quote" id="quote" role="button" tabindex="0" aria-label="Show another quote">
+            <div class="quote-text" id="quoteText" aria-live="polite">"The secret of getting ahead is getting started."</div>
+            <div class="quote-author" id="quoteAuthor">— Mark Twain</div>
+        </div>
     </div>
 
     <script src="sounds.js"></script>
