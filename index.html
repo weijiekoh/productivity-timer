@@ -32,7 +32,7 @@
             box-sizing: border-box;
         }
 
-        button, input {
+        button {
             font-family: inherit;
         }
 
@@ -111,83 +111,6 @@
 
         .start-btn.running:hover {
             background: #6ee6b8;
-        }
-
-        .settings {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-        }
-
-        .setting-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .setting-group label {
-            font-size: 14px;
-            color: #888;
-            margin-bottom: 8px;
-        }
-
-        .input-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .adjust-btn {
-            display: none;
-            width: 36px;
-            height: 36px;
-            border: 1px solid #444;
-            border-radius: 6px;
-            background: #16213e;
-            color: #888;
-            font-size: 20px;
-            cursor: pointer;
-            transition: border-color 0.2s, color 0.2s;
-        }
-
-        .adjust-btn:hover {
-            border-color: #888;
-            color: #eee;
-        }
-
-        .adjust-btn:active {
-            transform: scale(0.95);
-        }
-
-        .setting-group input {
-            width: 60px;
-            padding: 8px;
-            font-size: 16px;
-            border: 2px solid #0f3460;
-            border-radius: 6px;
-            background: #16213e;
-            color: #eee;
-            text-align: center;
-        }
-
-        .setting-group input:focus {
-            outline: none;
-            border-color: #e94560;
-        }
-
-        .unit {
-            font-size: 14px;
-            color: #666;
-        }
-
-        @media (max-width: 600px) {
-            .adjust-btn {
-                display: block;
-            }
-
-            .setting-group input {
-                width: 50px;
-            }
         }
 
         .session-counter {
@@ -294,10 +217,8 @@
 
         /* Hide UI during work phase */
         body.working .controls,
-        body.working .settings,
         body.working .session-counter,
         body.working .tagline,
-        body.working .adjust-btn,
         body.working .quote-hint {
             visibility: hidden;
         }
@@ -318,27 +239,6 @@
 
         <div class="controls">
             <button class="start-btn" id="startBtn">Start</button>
-        </div>
-
-        <div class="settings">
-            <div class="setting-group">
-                <label for="workMinutes">Work</label>
-                <div class="input-row">
-                    <button class="adjust-btn" id="workMinus">-</button>
-                    <input type="number" id="workMinutes" value="25" min="0" max="99">
-                    <span class="unit">min</span>
-                    <button class="adjust-btn" id="workPlus">+</button>
-                </div>
-            </div>
-            <div class="setting-group">
-                <label for="restMinutes">Rest</label>
-                <div class="input-row">
-                    <button class="adjust-btn" id="restMinus">-</button>
-                    <input type="number" id="restMinutes" value="5" min="0" max="99">
-                    <span class="unit">min</span>
-                    <button class="adjust-btn" id="restPlus">+</button>
-                </div>
-            </div>
         </div>
 
         <div class="session-counter" id="sessionCounter">Sessions: 0</div>

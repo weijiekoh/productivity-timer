@@ -1,7 +1,21 @@
+// Durations in minutes. Override via URL query, e.g. ?work=50&rest=10
+const DEFAULT_WORK_MINUTES = 25;
+const DEFAULT_REST_MINUTES = 5;
+const MAX_MINUTES = 999;
+
+// Read a duration in minutes from the URL; fall back to the default if invalid
+function getMinutesParam(name, fallback) {
+    const value = Number(new URLSearchParams(window.location.search).get(name));
+    return Number.isFinite(value) && value > 0 && value <= MAX_MINUTES ? value : fallback;
+}
+
+const workSeconds = Math.round(getMinutesParam('work', DEFAULT_WORK_MINUTES) * 60);
+const restSeconds = Math.round(getMinutesParam('rest', DEFAULT_REST_MINUTES) * 60);
+
 // State
 let isRunning = false;
 let isWorkPhase = true;
-let timeRemaining = 25 * 60; // in seconds
+let timeRemaining = workSeconds;
 let timerInterval = null;
 let sessionCount = 0;
 let wakeLock = null;
@@ -10,37 +24,22 @@ let wakeLock = null;
 const timerDisplay = document.getElementById('timerDisplay');
 const phaseIndicator = document.getElementById('phaseIndicator');
 const startBtn = document.getElementById('startBtn');
-const workMinutesInput = document.getElementById('workMinutes');
-const restMinutesInput = document.getElementById('restMinutes');
 const sessionCounter = document.getElementById('sessionCounter');
-const workMinus = document.getElementById('workMinus');
-const workPlus = document.getElementById('workPlus');
-const restMinus = document.getElementById('restMinus');
-const restPlus = document.getElementById('restPlus');
 
-// Load settings from localStorage
+// Load session count from localStorage
 function loadSettings() {
-    const savedWorkMinutes = localStorage.getItem('workMinutes');
-    const savedRestMinutes = localStorage.getItem('restMinutes');
     const savedSessionCount = localStorage.getItem('sessionCount');
-
-    if (savedWorkMinutes) {
-        workMinutesInput.value = savedWorkMinutes;
-    }
-    if (savedRestMinutes) {
-        restMinutesInput.value = savedRestMinutes;
-    }
     if (savedSessionCount) {
         sessionCount = parseInt(savedSessionCount, 10);
     }
 
-    timeRemaining = parseInt(workMinutesInput.value, 10) * 60;
+    // Durations no longer persist; remove values saved by older versions
+    localStorage.removeItem('workMinutes');
+    localStorage.removeItem('restMinutes');
 }
 
-// Save settings to localStorage
+// Save session count to localStorage
 function saveSettings() {
-    localStorage.setItem('workMinutes', workMinutesInput.value);
-    localStorage.setItem('restMinutes', restMinutesInput.value);
     localStorage.setItem('sessionCount', sessionCount);
 }
 
@@ -103,7 +102,6 @@ function updateDisplay() {
     } else {
         document.body.classList.remove('working');
     }
-    updateMinusButtons();
 }
 
 // Phase ended - stop timer and prepare next phase
@@ -122,14 +120,14 @@ function phaseEnded() {
         sessionCount++;
         saveSettings();
         isWorkPhase = false;
-        timeRemaining = parseInt(restMinutesInput.value, 10) * 60;
+        timeRemaining = restSeconds;
         showRandomQuote();
     } else {
         // Rest phase ended
         playRestEndSound();
         showNotification('Break Over!', 'Ready to work?');
         isWorkPhase = true;
-        timeRemaining = parseInt(workMinutesInput.value, 10) * 60;
+        timeRemaining = workSeconds;
     }
 
     updateDisplay();
@@ -166,56 +164,8 @@ function toggleTimer() {
     updateDisplay();
 }
 
-// Handle input changes
-function handleInputChange() {
-    saveSettings();
-    if (!isRunning) {
-        if (isWorkPhase) {
-            timeRemaining = parseInt(workMinutesInput.value, 10) * 60;
-        } else {
-            timeRemaining = parseInt(restMinutesInput.value, 10) * 60;
-        }
-        updateDisplay();
-    }
-    updateMinusButtons();
-}
-
-// Adjust time to multiples of 5 (for mobile +/- buttons)
-function adjustTime(type, delta) {
-    const input = type === 'work' ? workMinutesInput : restMinutesInput;
-    const current = parseInt(input.value, 10);
-    let newValue;
-
-    if (delta > 0) {
-        // Round up to next multiple of 5
-        newValue = Math.ceil((current + 1) / 5) * 5;
-    } else {
-        // Round down to previous multiple of 5
-        newValue = Math.floor((current - 1) / 5) * 5;
-    }
-
-    newValue = Math.max(0, Math.min(99, newValue));
-    input.value = newValue;
-    handleInputChange();
-}
-
-// Update visibility of minus buttons based on input values
-function updateMinusButtons() {
-    const isWorking = isWorkPhase && isRunning;
-
-    if (workMinus) {
-        workMinus.style.visibility = (isWorking || parseInt(workMinutesInput.value, 10) === 0) ? 'hidden' : '';
-    }
-    if (restMinus) {
-        restMinus.style.visibility = (isWorking || parseInt(restMinutesInput.value, 10) === 0) ? 'hidden' : '';
-    }
-}
-
 // Keyboard shortcuts
 function handleKeydown(e) {
-    // Ignore if typing in input fields
-    if (e.target.tagName === 'INPUT') return;
-
     if (e.code === 'Space') {
         e.preventDefault();
         toggleTimer();
@@ -224,15 +174,7 @@ function handleKeydown(e) {
 
 // Event listeners
 startBtn.addEventListener('click', toggleTimer);
-workMinutesInput.addEventListener('change', handleInputChange);
-restMinutesInput.addEventListener('change', handleInputChange);
 document.addEventListener('keydown', handleKeydown);
-
-// Adjust button listeners
-if (workMinus) workMinus.addEventListener('click', () => adjustTime('work', -5));
-if (workPlus) workPlus.addEventListener('click', () => adjustTime('work', 5));
-if (restMinus) restMinus.addEventListener('click', () => adjustTime('rest', -5));
-if (restPlus) restPlus.addEventListener('click', () => adjustTime('rest', 5));
 
 // Warn before closing page while timer is running
 window.addEventListener('beforeunload', (e) => {
@@ -244,4 +186,3 @@ window.addEventListener('beforeunload', (e) => {
 // Initialize
 loadSettings();
 updateDisplay();
-updateMinusButtons();
