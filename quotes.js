@@ -94,16 +94,24 @@ const quotes = [
 ];
 
 // DOM elements (cached)
+const quoteEl = document.getElementById('quote');
 const quoteTextEl = document.getElementById('quoteText');
 const quoteAuthorEl = document.getElementById('quoteAuthor');
 
-// Get a random quote
+let currentQuote = null;
+
+// Get a random quote that differs from the current one
 function getRandomQuote() {
-    return quotes[Math.floor(Math.random() * quotes.length)];
+    let quote;
+    do {
+        quote = quotes[Math.floor(Math.random() * quotes.length)];
+    } while (quotes.length > 1 && quote === currentQuote);
+    return quote;
 }
 
 // Display a quote in the UI
 function displayQuote(quote) {
+    currentQuote = quote;
     if (quoteTextEl && quoteAuthorEl) {
         quoteTextEl.textContent = `"${quote.text}"`;
         quoteAuthorEl.textContent = `— ${quote.author}`;
@@ -113,4 +121,33 @@ function displayQuote(quote) {
 // Show a random quote
 function showRandomQuote() {
     displayQuote(getRandomQuote());
+}
+
+// Fade out, swap the quote, fade in
+const QUOTE_FADE_MS = 200;
+let quoteFadeTimeout = null;
+
+function changeQuote() {
+    if (!quoteEl) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+        showRandomQuote();
+        return;
+    }
+    clearTimeout(quoteFadeTimeout);
+    quoteEl.classList.add('changing');
+    quoteFadeTimeout = setTimeout(() => {
+        showRandomQuote();
+        quoteEl.classList.remove('changing');
+    }, QUOTE_FADE_MS);
+}
+
+if (quoteEl) {
+    quoteEl.addEventListener('click', changeQuote);
+    quoteEl.addEventListener('keydown', (e) => {
+        // Enter only: Space is the global start/stop shortcut (app.js)
+        if (e.key === 'Enter') {
+            changeQuote();
+        }
+    });
 }

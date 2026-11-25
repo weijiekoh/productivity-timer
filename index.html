@@ -205,6 +205,78 @@
         .quote {
             margin-bottom: 30px;
             max-width: 400px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .quote:hover {
+            background-color: rgba(255, 255, 255, 0.04);
+        }
+
+        .quote:active {
+            transform: scale(0.98);
+        }
+
+        .quote:focus-visible {
+            outline: 2px solid #4ecca3;
+            outline-offset: 2px;
+        }
+
+        .quote-text,
+        .quote-author {
+            transition: opacity 0.2s;
+        }
+
+        .quote.changing .quote-text,
+        .quote.changing .quote-author {
+            opacity: 0;
+        }
+
+        .quote-hint {
+            margin-top: 10px;
+            font-size: 11px;
+            color: #555;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .quote:hover .quote-hint,
+        .quote:focus-visible .quote-hint {
+            opacity: 1;
+        }
+
+        .quote-hint .tap {
+            display: none;
+        }
+
+        /* Touch devices: no hover, so always show the hint */
+        @media (hover: none) {
+            .quote-hint {
+                opacity: 1;
+            }
+
+            .quote-hint .click {
+                display: none;
+            }
+
+            .quote-hint .tap {
+                display: inline;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .quote,
+            .quote-text,
+            .quote-author,
+            .quote-hint {
+                transition: none;
+            }
         }
 
         .quote-text {
@@ -225,16 +297,18 @@
         body.working .settings,
         body.working .session-counter,
         body.working .tagline,
-        body.working .adjust-btn {
+        body.working .adjust-btn,
+        body.working .quote-hint {
             visibility: hidden;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="quote">
-            <div class="quote-text" id="quoteText">"The secret of getting ahead is getting started."</div>
+        <div class="quote" id="quote" role="button" tabindex="0" aria-label="Show another quote">
+            <div class="quote-text" id="quoteText" aria-live="polite">"The secret of getting ahead is getting started."</div>
             <div class="quote-author" id="quoteAuthor">— Mark Twain</div>
+            <div class="quote-hint" aria-hidden="true"><span class="click">Click</span><span class="tap">Tap</span> for another quote</div>
         </div>
 
         <div class="timer-display">
