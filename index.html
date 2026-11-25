@@ -46,11 +46,30 @@
             color: #eee;
         }
 
+        /* Center the timer and button. The quote hangs below them, so its
+           height does not move them. */
         .container {
             width: 100%;
             max-width: 500px;
+            height: 100vh;
+            height: 100dvh;
+            display: grid;
+            grid-template-rows: minmax(0, 1fr) auto auto minmax(0, 1fr);
             text-align: center;
             padding: 40px;
+        }
+
+        .timer-display {
+            grid-row: 2;
+        }
+
+        .controls {
+            grid-row: 3;
+        }
+
+        .quote {
+            grid-row: 4;
+            align-self: start;
         }
 
         .timer-display {
